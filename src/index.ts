@@ -153,6 +153,7 @@ const main = async () => {
           gravity: 'southeast',
         },
       ])
+      .rotate()
       .toFile(path.resolve(OUTPUT_IMAGES_PATH, imageFile))
     console.log(imageFile, labelText)
   }
