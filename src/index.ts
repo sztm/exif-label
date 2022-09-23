@@ -146,6 +146,7 @@ const main = async () => {
     const labelText = makeLabel(exifData)
     const labelImageBuffer = await createLabelImage(labelText)
     await sharp(imagePath)
+      .withMetadata()
       .composite([
         {
           input: labelImageBuffer,
