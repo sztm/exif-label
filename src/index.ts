@@ -68,9 +68,10 @@ const createLabelImage = async (
 }
 
 const extractSettingInfo = (exifData: ExifData): string => {
-  const { FNumber, FocalLength, ISO, ExposureTime } = exifData.exif
+  const { FNumber, FocalLengthIn35mmFormat, ISO, ExposureTime } = exifData.exif
 
-  const focalLength = FocalLength && `${FocalLength}mm`
+  const focalLength =
+    FocalLengthIn35mmFormat && `${Math.round(FocalLengthIn35mmFormat)}mm`
   const fNumber = FNumber && `F${FNumber}`
   const exposureTime =
     ExposureTime !== undefined &&
