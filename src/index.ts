@@ -29,11 +29,14 @@ const extractExif = (filePath: string): Promise<ExifData> => {
   })
 }
 
-const createLabelImage = async (labelText: string): Promise<Buffer> => {
-  const margin = 10
-  const padding = 32
+const createLabelImage = async (
+  labelText: string,
+  cropZoomRatio: number = 1.0
+): Promise<Buffer> => {
+  const margin = 10 / cropZoomRatio
+  const padding = 32 / cropZoomRatio
 
-  const fontSize = 70
+  const fontSize = 70 / cropZoomRatio
   const width = labelText.length * (fontSize / 2) + padding + margin
   const height = fontSize * 1.2 + margin
 
@@ -91,6 +94,14 @@ const extractLensInfo = (exifData: ExifData): string => {
   return lensInfo
 }
 
+const calcCropZoomRatio = (exifData: ExifData): number => {
+  const { FocalLength, FocalLengthIn35mmFormat } = exifData.exif
+  if (FocalLength === undefined || FocalLengthIn35mmFormat === undefined) {
+    return 1.0
+  }
+  return FocalLengthIn35mmFormat / FocalLength
+}
+
 const extractCameraInfo = (exifData: ExifData): string => {
   const { Make, Model } = exifData.image
   let cameraInfo: string
@@ -144,7 +155,8 @@ const main = async () => {
     const imagePath = path.resolve(ORIGINAL_IMAGES_PATH, imageFile)
     const exifData = await extractExif(imagePath)
     const labelText = makeLabel(exifData)
-    const labelImageBuffer = await createLabelImage(labelText)
+    const cropZoomRatio = calcCropZoomRatio(exifData)
+    const labelImageBuffer = await createLabelImage(labelText, cropZoomRatio)
     await sharp(imagePath)
       .withMetadata()
       .composite([
